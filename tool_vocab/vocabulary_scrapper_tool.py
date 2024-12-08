@@ -1,5 +1,5 @@
 import subprocess
-from text_prepocessing import normalize_words
+from .text_prepocessing import normalize_words
 
 def get_vocabulary_info_tool(query):
     context = []

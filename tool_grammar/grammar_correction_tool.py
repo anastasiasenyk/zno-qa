@@ -1,5 +1,5 @@
 import language_tool_python
-from text_preprocessing import divide_into_sentences
+from .text_preprocessing import divide_into_sentences
 
 def grammar_check_and_correct(text: str):
     tool = language_tool_python.LanguageTool('uk-UA')
