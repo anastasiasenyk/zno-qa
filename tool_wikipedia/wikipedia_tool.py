@@ -16,7 +16,7 @@ def get_wikipedia_context(query):
         page_embedding = embedding_model.encode(page.page_content, convert_to_tensor=True)
         score = util.pytorch_cos_sim(query_embedding, page_embedding).item()
         if score >= 0.5:
-            context += f"{keyword} (Relevance: {score:.2f}):\n{page.page_content}\n\n"
+            context += f"{keyword}: {page.page_content}\n\n"
         else:
             context += f"{keyword}: Не можливо знайти інформацію.\n\n"
 
