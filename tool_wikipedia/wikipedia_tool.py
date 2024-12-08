@@ -18,6 +18,6 @@ def get_wikipedia_context(query):
         if score >= 0.5:
             context += f"{keyword} (Relevance: {score:.2f}):\n{page.page_content}\n\n"
         else:
-            context += f"{keyword} (Relevance: {score:.2f}): Не релевантна інформація.\n\n"
+            context += f"{keyword}: Не можливо знайти інформацію.\n\n"
 
     return context.strip()
