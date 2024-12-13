@@ -4,6 +4,8 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import END, START, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 
+from retriever_pipeline.retrieve import preprocess_documents, retrieve_relevant_chunks
+
 from loguru import logger
 import os
 from dotenv import load_dotenv
@@ -31,14 +33,16 @@ def search_vocab_dict(word: str) -> str:
 @tool
 def extract_from_history_docs(query: str) -> str:
     """AIMessage tool to perform RAG based search on history documents"""
-    # TODO: Add implementation
-    return f"Extracting information from history documents for {query}"
+    model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0.1)
+    result = retrieve_relevant_chunks(history_chunks_file, model, query)
+    return f"Extracting information from history documents for {result}"
 
 @tool
 def extract_from_ukr_lit_docs(query: str) -> str:
     """AIMessage tool to perform RAG based search on Ukrainian literature documents"""
-    # TODO: Add implementation
-    return f"Extracting information from Ukrainian literature documents for {query}"
+    model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0.1)
+    result = retrieve_relevant_chunks(literature_chunks_file, model, query)
+    return f"Extracting information from history documents for {result}"
 
 def setup_qa_app():
     history_tools = [extract_from_history_docs]
@@ -134,7 +138,22 @@ class ZNOAgent:
             pass
 
 
+base_dir = './retriever_pipeline'
+data_dir = os.path.join(base_dir, 'data')
+literature_chunks_file = os.path.join(data_dir, 'literature_chunks.pkl')
+history_chunks_file = os.path.join(data_dir, 'history_chunks.pkl')
+
+
 if __name__ == "__main__":
+    documents_dir = os.path.join(base_dir, 'documents_txt')
+    os.makedirs(data_dir, exist_ok=True)
+
+    # Preprocess documents
+    literature_docs = os.path.join(documents_dir, 'literature', '*.txt')
+    preprocess_documents(literature_docs, literature_chunks_file)
+    history_docs = os.path.join(documents_dir, 'history', '*.txt')
+    preprocess_documents(history_docs, history_chunks_file)
+
     agent = ZNOAgent()
     agent.render_app_graph()
 
