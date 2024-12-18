@@ -17,12 +17,6 @@ def grammar_check_and_correct(text: str):
                 'errors': errors,
                 'corrected_sentence': corrected_sentence
             })
-        else:
-            result.append({
-                'sentence': sentence,
-                'errors': None,
-                'corrected_sentence': sentence
-            })
             
     tool.close()
     return str(result)
