@@ -6,7 +6,7 @@ import os
 
 
 def get_response_llama(question):
-    client = Together(api_key="48b3165bc375864a7fa01a488f1a7e8200d93750eaff0fe1d070faaf293dd282")
+    client = Together(api_key="apikey")
     
     instruction = "Обери правильну відповідь і поверни одну із букв (А, Б, В, Г чи Д) без додаткових символів\n"
 
@@ -34,7 +34,7 @@ def get_response_llama(question):
 
 
 def get_response_mistralai(question):
-    api_key = "VfYhdPWFvbdjGv5UKkh0pYJMMsesmdTi"
+    api_key = "apikey"
     model = "mistral-large-latest"
 
     client = Mistral(api_key=api_key)
@@ -56,7 +56,7 @@ def get_response_mistralai(question):
 # Define the function using ChatAnthropic
 def get_response_claude(question):
     # Replace "..." with your actual Anthropic API key
-    api_key = "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"  
+    api_key = "sk-ant-"  
     
     # Initialize the Claude model
     model = ChatAnthropic(

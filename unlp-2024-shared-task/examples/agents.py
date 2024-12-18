@@ -34,7 +34,7 @@ class MistralLLM(LLM, BaseModel):
 
 
 # Initialize the Mistral client through the custom LLM wrapper
-mistral_llm = MistralLLM(api_key="VfYhdPWFvbdjGv5UKkh0pYJMMsesmdTi")
+mistral_llm = MistralLLM(api_key="apikey")
 
 # Define the prompt template
 prompt = PromptTemplate(
