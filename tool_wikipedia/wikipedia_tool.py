@@ -18,6 +18,6 @@ def get_wikipedia_context(query):
         if score >= 0.5:
             context += f"{keyword}: {page.page_content}\n\n"
         else:
-            context += f"{keyword}: Не можливо знайти інформацію.\n\n"
+            context += f"{keyword}: {None}\n\n"
 
     return context.strip()

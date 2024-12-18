@@ -20,9 +20,12 @@ from dataclasses import dataclass
 import random
 from loguru import logger
 from time import sleep
+import sys
+# from llms import get_response_llama, get_response_mistralai, get_response_claude
 
-from llms import get_response_llama, get_response_mistralai, get_response_claude
-
+sys.path.append("../../")
+from zno_agent import ZNOAgent
+agent = ZNOAgent()
 
 @dataclass
 class Choice:
@@ -57,6 +60,11 @@ def predict(dataset: list[Task], *, verbose=True) -> list[str]:
         # Nevertheless, we list the steps here to match the real
         # use-case closer.
         prompt = make_prompt(sample)
+        source = sample.source
+        if source == "ukrainian-language-and-literature":
+            prompt = "Українська мова та література: " + prompt
+        elif source == "history-of-ukraine":
+            prompt = "Історія України: " + prompt
         completion = complete(prompt)
         answer = parse_completion(completion)
         answers.append(answer)
@@ -125,15 +133,16 @@ def complete(prompt: str) -> str:
     # Normally, you'd generate it from a language model
     # return random.choice(["А", "Б", "В", "Г", "Д"])
     # return get_response_llama(prompt)
+    instruction = "Ти агент, який вміє розв'язувати тести з української мови, української літератури та історії України. Якщо вхідне питання з української мови, не переформульовуй його.\n\n"
     sleep(random.uniform(2, 3))
     try:
-        response = get_response_claude(prompt)
+        response = agent.ask_question(instruction + prompt)["answer"]
     except Exception as e:
         logger.error(f"Error: {e}")
         # if error status 429 sleep for 1 min and try again
         if "429" in str(e):
             sleep(60)
-            response = get_response_claude(prompt)
+            response = agent.ask_question(instruction + prompt)["answer"]
         else:
             return
     return response
@@ -185,7 +194,7 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true", help="Print generated prompt")
     args = parser.parse_args()
 
-    k = 100
+    k = 5
     dataset = load_dataset(args.dataset)[:k]
     answers = predict(dataset, verbose=True)
     accuracy = compute_metric(dataset, answers)

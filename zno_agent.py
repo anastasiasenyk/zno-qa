@@ -29,7 +29,7 @@ def spelling_check(text: str) -> str:
 
 @tool
 def search_vocab_dict(word: str) -> str:
-    """Інструмент для пошуку слова в словнику, який містить інформацію про наголос, частину мови і форми слова"""
+    """Інструмент для пошуку слова в словнику, який містить інформацію про наголос, частину мови(іменник, прикметник, дієслово, ...) і форми слова(відмінки, роди, число, ...)"""
     result = get_vocabulary_info_tool(word)
     return result
 
@@ -57,6 +57,8 @@ def setup_qa_app():
 
     def should_continue(state: MessagesState):
         messages = state["messages"]
+        if len(messages) == 5:
+            return END
         last_message = messages[-1]
         if last_message.tool_calls:
             if last_message.tool_calls[0]["name"] in [f.name for f in history_tools]:
@@ -125,6 +127,13 @@ class ZNOAgent:
         load_dotenv('env_variables.env', override=True)
         self.app = setup_qa_app()
         self.parser = setup_output_parser()
+        documents_dir = os.path.join(base_dir, 'documents_txt')
+        os.makedirs(data_dir, exist_ok=True)
+
+        literature_docs = os.path.join(documents_dir, 'literature', '*.txt')
+        preprocess_documents(literature_docs, literature_chunks_file)
+        history_docs = os.path.join(documents_dir, 'history', '*.txt')
+        preprocess_documents(history_docs, history_chunks_file)
 
     def ask_question(self, question: str):
         result = self.app.invoke({"messages": [HumanMessage(question)]})
@@ -141,24 +150,17 @@ class ZNOAgent:
             pass
 
 
-base_dir = './retriever_pipeline'
+base_dir = '../../retriever_pipeline'
 data_dir = os.path.join(base_dir, 'data')
 literature_chunks_file = os.path.join(data_dir, 'literature_chunks.pkl')
 history_chunks_file = os.path.join(data_dir, 'history_chunks.pkl')
 
 
 if __name__ == "__main__":
-    documents_dir = os.path.join(base_dir, 'documents_txt')
-    os.makedirs(data_dir, exist_ok=True)
 
-    # Preprocess documents
-    literature_docs = os.path.join(documents_dir, 'literature', '*.txt')
-    preprocess_documents(literature_docs, literature_chunks_file)
-    history_docs = os.path.join(documents_dir, 'history', '*.txt')
-    preprocess_documents(history_docs, history_chunks_file)
 
     agent = ZNOAgent()
     agent.render_app_graph()
 
-    question = "Ти агент, який вміє розв'язувати тести з української мови, української літератури та історії України. Якщо вхідне питання з української мови, не переформульовуй його.\nВідповідай на питання, використовуючи такі інструменти:\nsearch_wikipedia - інструмент для пошуку інформації в вікіпедії;\nspelling_check - інструмент для перевірки правильності написання слів;\nsearch_vocab_dict - інструмент для пошуку слова в словнику, який містить інформацію про наголос, частину мови(іменник, прикметник, дієслово, ...) і форми слова(відмінки, роди, число, ...);\nextract_from_history_docs - інструмент для пошуку інформації в документах з історії;\nextract_from_ukr_lit_docs - інструмент для пошуку інформації в документах з української літератури.\n\n" + "Позначте рядок, у якому всі слова належать до дієслів:\n\nА. крикніть, кричиш, крикливий, покрикувати;\nБ. переходячи, переходив би, перехідний, переходьте;\nВ. перемігши, перемогти, переможний, переможено;\nГ. учити, навчивши, учeний, учіться;\nД. запечений, запік би, запікаючи, запікся."
+    question = "Ти агент, який вміє розв'язувати тести з української мови, української літератури та історії України. Якщо вхідне питання з української мови, не переформульовуй його" + "Реалізація імперської стратегії Росії в Першій світовій війні щодо \"…злиття землі Ярослава Осмомисла, князів Данила і Романа з Імперією в політичному, соціальному та національному відношеннях…\" стала можливою завдяки\nА. Карпатській операції.\nБ. Горліцькому прориву.\nВ. Брусиловському прориву.\nГ. Галицькій битві."
     print(agent.ask_question(question))

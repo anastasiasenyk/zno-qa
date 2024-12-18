@@ -34,9 +34,9 @@ def noun_chunks_extraction(query):
     summary = nlp.extract_entities(query)
     return summary_processing(summary)
 
-def entitities_extraction(query):
+def entities_extraction(query):
     return [ent.lemma_ for ent in uk_nlp(query).ents]
 
 def keywords_extraction(query):
-    keywords = set(noun_chunks_extraction(query) + entitities_extraction(query))
+    keywords = set(entities_extraction(query))
     return list(keywords)
