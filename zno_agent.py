@@ -5,7 +5,7 @@ from langgraph.graph import END, START, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 
 from retriever_pipeline.retrieve import preprocess_documents, retrieve_relevant_chunks
-from tool_grammar.grammar_correction_tool import grammar_check_and_correct
+from tool_spelling.spelling_correction_tool import spelling_check_and_correct
 from tool_wikipedia.wikipedia_tool import get_wikipedia_context
 from tool_vocab.vocabulary_scrapper_tool import get_vocabulary_info_tool
 
@@ -17,32 +17,32 @@ from dotenv import load_dotenv
 # TODO: experiment with ukr/eng prompts and docstrings
 @tool
 def search_wikipedia(query: str) -> str:
-    """AIMessage tool to search wikipedia"""
+    """Інструмент для пошуку інформації в Вікіпедії"""
     result = get_wikipedia_context(query)
     return result
 
 @tool
-def grammar_check(text: str) -> str:
-    """AIMessage tool to check grammar and spelling in text"""
-    result = grammar_check_and_correct(text)
+def spelling_check(text: str) -> str:
+    """Інструмент для перевірки правильності написання слів"""
+    result = spelling_check_and_correct(text)
     return result
 
 @tool
 def search_vocab_dict(word: str) -> str:
-    """AIMessage tool to search vocabulary for a word"""
+    """Інструмент для пошуку слова в словнику, який містить інформацію про наголос, частину мови і форми слова"""
     result = get_vocabulary_info_tool(word)
     return result
 
 @tool
 def extract_from_history_docs(query: str) -> str:
-    """AIMessage tool to perform RAG based search on history documents"""
+    """Інструмент для пошуку інформації в документах з історії"""
     model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0.1)
     result = retrieve_relevant_chunks(history_chunks_file, model, query)
     return result
 
 @tool
 def extract_from_ukr_lit_docs(query: str) -> str:
-    """AIMessage tool to perform RAG based search on Ukrainian literature documents"""
+    """Інструмент для пошуку інформації в документах з української літератури"""
     model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0.1)
     result = retrieve_relevant_chunks(literature_chunks_file, model, query)
     return result
@@ -50,7 +50,7 @@ def extract_from_ukr_lit_docs(query: str) -> str:
 def setup_qa_app():
     history_tools = [extract_from_history_docs]
     ukr_lit_tools = [extract_from_ukr_lit_docs]
-    ukr_lang_tools = [grammar_check, search_vocab_dict]
+    ukr_lang_tools = [spelling_check, search_vocab_dict]
     wikipedia_tools = [search_wikipedia]
 
     model_with_tools = ChatAnthropic(model="claude-3-haiku-20240307", temperature=0).bind_tools(history_tools + ukr_lit_tools + ukr_lang_tools + wikipedia_tools)
@@ -160,5 +160,5 @@ if __name__ == "__main__":
     agent = ZNOAgent()
     agent.render_app_graph()
 
-    question = "Позначте рядок, у якому в усіх словах потрібно писати літеру *и*:\n\nА. бад..лина, благоч..стивий, кр..хкий, ж..виця;\nБ. вар..во, меж..річчя, вич..пурений, кр..шталь;\nВ. п’ят..річка, заруч..ни, нев..димка, обітн..ця;\nГ. зач..нати, виконав..ця, знів..чити, вел..чина;\nД. нож..чок, печ..во, викор..нити, оз..ратися."
+    question = "Ти агент, який вміє розв'язувати тести з української мови, української літератури та історії України. Якщо вхідне питання з української мови, не переформульовуй його.\nВідповідай на питання, використовуючи такі інструменти:\nsearch_wikipedia - інструмент для пошуку інформації в вікіпедії;\nspelling_check - інструмент для перевірки правильності написання слів;\nsearch_vocab_dict - інструмент для пошуку слова в словнику, який містить інформацію про наголос, частину мови(іменник, прикметник, дієслово, ...) і форми слова(відмінки, роди, число, ...);\nextract_from_history_docs - інструмент для пошуку інформації в документах з історії;\nextract_from_ukr_lit_docs - інструмент для пошуку інформації в документах з української літератури.\n\n" + "Позначте рядок, у якому всі слова належать до дієслів:\n\nА. крикніть, кричиш, крикливий, покрикувати;\nБ. переходячи, переходив би, перехідний, переходьте;\nВ. перемігши, перемогти, переможний, переможено;\nГ. учити, навчивши, учeний, учіться;\nД. запечений, запік би, запікаючи, запікся."
     print(agent.ask_question(question))

@@ -1,7 +1,7 @@
 import language_tool_python
 from .text_preprocessing import divide_into_sentences
 
-def grammar_check_and_correct(text: str):
+def spelling_check_and_correct(text: str):
     tool = language_tool_python.LanguageTool('uk-UA')
     sentences = divide_into_sentences(text)
     result = []
@@ -14,7 +14,6 @@ def grammar_check_and_correct(text: str):
             corrected_sentence = tool.correct(sentence)
             result.append({
                 'sentence': sentence,
-                'errors': errors,
                 'corrected_sentence': corrected_sentence
             })
             
