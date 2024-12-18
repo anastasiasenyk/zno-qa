@@ -1,6 +1,0 @@
-spacy==3.7.5
-uk-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/uk_core_news_sm-3.7.0/uk_core_news_sm-3.7.0-py3-none-any.whl#sha256=782ab2dad21895039aaa77f721acc0a5be383d38447d8971e88750393373927a
-wikipedia==1.4.0
-noun-phrase-ua==0.0.5
-sentence-transformers==3.3.1
-langchain-community==0.3.8

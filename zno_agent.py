@@ -5,6 +5,9 @@ from langgraph.graph import END, START, StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 
 from retriever_pipeline.retrieve import preprocess_documents, retrieve_relevant_chunks
+from tool_grammar.grammar_correction_tool import grammar_check_and_correct
+from tool_wikipedia.wikipedia_tool import get_wikipedia_context
+from tool_vocab.vocabulary_scrapper_tool import get_vocabulary_info_tool
 
 from loguru import logger
 import os
@@ -15,34 +18,34 @@ from dotenv import load_dotenv
 @tool
 def search_wikipedia(query: str) -> str:
     """AIMessage tool to search wikipedia"""
-    # TODO: Add implementation
-    return f"Searching wikipedia for {query}"
+    result = get_wikipedia_context(query)
+    return result
 
 @tool
 def grammar_check(text: str) -> str:
     """AIMessage tool to check grammar and spelling in text"""
-    # TODO: Add implementation
-    return f"Checking grammar for {text}"
+    result = grammar_check_and_correct(text)
+    return result
 
 @tool
 def search_vocab_dict(word: str) -> str:
     """AIMessage tool to search vocabulary for a word"""
-    # TODO: Add implementation
-    return f"Searching vocabulary for {word}"
+    result = get_vocabulary_info_tool(word)
+    return result
 
 @tool
 def extract_from_history_docs(query: str) -> str:
     """AIMessage tool to perform RAG based search on history documents"""
     model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0.1)
     result = retrieve_relevant_chunks(history_chunks_file, model, query)
-    return f"Extracting information from history documents for {result}"
+    return result
 
 @tool
 def extract_from_ukr_lit_docs(query: str) -> str:
     """AIMessage tool to perform RAG based search on Ukrainian literature documents"""
     model = ChatAnthropic(model="claude-3-5-sonnet-20240620", temperature=0.1)
     result = retrieve_relevant_chunks(literature_chunks_file, model, query)
-    return f"Extracting information from history documents for {result}"
+    return result
 
 def setup_qa_app():
     history_tools = [extract_from_history_docs]
