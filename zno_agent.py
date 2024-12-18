@@ -150,7 +150,7 @@ class ZNOAgent:
             pass
 
 
-base_dir = '../../retriever_pipeline'
+base_dir = os.path.join('..', '..', 'retriever_pipeline')
 data_dir = os.path.join(base_dir, 'data')
 literature_chunks_file = os.path.join(data_dir, 'literature_chunks.pkl')
 history_chunks_file = os.path.join(data_dir, 'history_chunks.pkl')
